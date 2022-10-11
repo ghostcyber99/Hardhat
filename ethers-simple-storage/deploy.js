@@ -1,17 +1,19 @@
 const ethers = require("ethers");
 const fs = require("fs-extra");
+require("dotenv").config();
 
 async function main() {
   //http:127.0.0.1:7545
   //connecting our script to local blockchain
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:8545"
+  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+  //creating wallet with encrypted key
+  const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf8");
+  let wallet = new ethers.Wallet.fromEncryptedJsonSync(
+    encryptedJson,
+    process.env.PRIVATE_KEY_PASSWORD
   );
-  //connecting our wallet
-  const wallet = new ethers.Wallet(
-    "0xb50f460f18700bbc1a0dcaccf1273b2bdfa281f88d1b32ef58467062c1a5cbf2",
-    provider
-  );
+  //conect to the provider
+  wallet = await wallet.connect(provider);
   //connecting to the contract ABI
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
   //connect to the contract binary
@@ -23,7 +25,7 @@ async function main() {
   const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
   console.log("Deploying, please wait....");
   const contract = await contractFactory.deploy();
-  //create transcation receipt to get confirmation that the contract has been added to the block
+  //we then wait for the contract to be deployed to one block
   await contract.deployTransaction.wait(1);
   // console.log("lets deploy with only transaction data!");
   // const nonce = await wallet.getTransactionCount();
