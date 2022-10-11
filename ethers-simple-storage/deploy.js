@@ -6,12 +6,16 @@ async function main() {
   //http:127.0.0.1:7545
   //connecting our script to local blockchain
   const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
   //creating wallet with encrypted key
-  const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf8");
-  let wallet = new ethers.Wallet.fromEncryptedJsonSync(
-    encryptedJson,
-    process.env.PRIVATE_KEY_PASSWORD
-  );
+  // const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf8");
+  // let wallet = ethers.Wallet.fromEncryptedJsonSync(
+  //   encryptedJson,
+  //   "Smith3dx"
+  //   //process.env.PRIVATE_KEY_PASSWORD
+  //   //console.log(PRIVATE_KEY_PASSWORD)
+  // );
+  //return console.log(wallet);
   //conect to the provider
   wallet = await wallet.connect(provider);
   //connecting to the contract ABI
@@ -23,6 +27,7 @@ async function main() {
   );
   //connecting to the contract factory which is used to deploy contracts
   const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
+
   console.log("Deploying, please wait....");
   const contract = await contractFactory.deploy();
   //we then wait for the contract to be deployed to one block
@@ -44,7 +49,7 @@ async function main() {
 
   const currentFovoriteNumber = await contract.retrieve();
   console.log(`Current favorite number is ${currentFovoriteNumber.toString()}`);
-  const transactionResponce = await contract.store("9");
+  const transactionResponce = await contract.store("3");
   const transactionReceipt = await transactionResponce.wait(1);
   const updatedFavoriteNumber = await contract.retrieve();
   console.log(`updated favorite Number is ${updatedFavoriteNumber}`);
