@@ -1,12 +1,12 @@
-const ethers = require("ethers");
-const fs = require("fs-extra");
-require("dotenv").config();
+const ethers = require("ethers")
+const fs = require("fs-extra")
+require("dotenv").config()
 
 async function main() {
   //http:127.0.0.1:7545
   //connecting our script to local blockchain
-  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
+  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
   //creating wallet with encrypted key
   // const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf8");
   // let wallet = ethers.Wallet.fromEncryptedJsonSync(
@@ -17,21 +17,22 @@ async function main() {
   // );
   //return console.log(wallet);
   //conect to the provider
-  wallet = await wallet.connect(provider);
+  wallet = await wallet.connect(provider)
   //connecting to the contract ABI
-  const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
+  const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8")
   //connect to the contract binary
   const binary = fs.readFileSync(
     "./SimpleStorage_sol_SimpleStorage.bin",
     "utf8"
-  );
+  )
   //connecting to the contract factory which is used to deploy contracts
-  const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
+  const contractFactory = new ethers.ContractFactory(abi, binary, wallet)
 
-  console.log("Deploying, please wait....");
-  const contract = await contractFactory.deploy();
+  console.log("Deploying, please wait....")
+  const contract = await contractFactory.deploy()
   //we then wait for the contract to be deployed to one block
-  await contract.deployTransaction.wait(1);
+  await contract.deployTransaction.wait(1)
+  console.log(`Contract address: ${contract.address}`)
   // console.log("lets deploy with only transaction data!");
   // const nonce = await wallet.getTransactionCount();
   // const tx = {
@@ -47,16 +48,16 @@ async function main() {
   // await sentTxResponse.wait(1);
   // console.log(sentTxResponse);
 
-  const currentFovoriteNumber = await contract.retrieve();
-  console.log(`Current favorite number is ${currentFovoriteNumber.toString()}`);
-  const transactionResponce = await contract.store("3");
-  const transactionReceipt = await transactionResponce.wait(1);
-  const updatedFavoriteNumber = await contract.retrieve();
-  console.log(`updated favorite Number is ${updatedFavoriteNumber}`);
+  const currentFovoriteNumber = await contract.retrieve()
+  console.log(`Current favorite number is ${currentFovoriteNumber.toString()}`)
+  const transactionResponce = await contract.store("3")
+  const transactionReceipt = await transactionResponce.wait(1)
+  const updatedFavoriteNumber = await contract.retrieve()
+  console.log(`updated favorite Number is ${updatedFavoriteNumber}`)
 }
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+    console.error(error)
+    process.exit(1)
+  })
