@@ -22,10 +22,8 @@ describe("SimpleStorage", function() {
     //checking the updated value
     const transactionResponse = await simpleStorage.store(expectedValue)
     await transactionResponse.wait(1)
-
-    //getting the current value 
+    //getting the current value  
     const currentValue = await simpleStorage.retrieve()
-    
     assert.equal(currentValue.toString(), expectedValue)
   })
 })
