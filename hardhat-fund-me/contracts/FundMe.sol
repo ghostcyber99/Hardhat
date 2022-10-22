@@ -19,8 +19,12 @@ contract fundMe {
     //making sure only the owner of the constract can withdraw form the contract
     address public immutable i_owner;
 
-    constructor() {
+    //setting the interface to use whatever chain you are on
+    AggregatorV3Interface public priceFeed;
+
+    constructor(address priceFeedAddress) {
         i_owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     //contract  can hold funds like wallets can hold funds
@@ -31,7 +35,10 @@ contract fundMe {
         //1e18 is the value of wei == 1eth
         //reverting is where the contract revert any gas because the contract value was not met.
         // gas was spent in the initail computation but every else would be reverted
-        require(msg.value.getConversationRate() >= MINIUM_USD, "Not enough");
+        require(
+            msg.value.getConversationRate(priceFeed) >= MINIUM_USD,
+            "Not enough"
+        );
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] = msg.value;
     }
