@@ -9,6 +9,7 @@ const { getNamedAccounts, deployments, network } = require("hardhat")
 // }
 
 const { networkConfig } = require("../helper-hardhat-config")
+const { network } = require("hardhat")
 
 // module.exports.default = deployFunc
 
